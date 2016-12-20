@@ -1,9 +1,10 @@
 package com.elsyton.curator
 
-import scala.concurrent.{Future, Promise}
-import scala.language.implicitConversions
 import org.apache.curator.framework.CuratorFramework
 import org.apache.curator.framework.api._
+
+import scala.concurrent.{Future, Promise}
+import scala.language.implicitConversions
 import scala.util.Try
 
 object BackgroundConversions {
@@ -28,7 +29,7 @@ object BackgroundConversions {
   }
 
   implicit class BackgroundPathableWithFuture[T](backgroundPathable: BackgroundPathable[T]) {
-    def inFuture[R](fun: (CuratorEvent) => R) = {
+    def inFuture[R](fun: (CuratorEvent) => R): PathableWithPromise[T, R] = {
       val p = Promise[R]()
       new PathableWithPromise(backgroundPathable.inBackground({ event: CuratorEvent =>
         p.complete(Try(fun(event)))
@@ -37,7 +38,7 @@ object BackgroundConversions {
   }
 
   implicit class BackgroundPathAndByteableWithFuture[T](backgroundPathAndBytesable: BackgroundPathAndBytesable[T]) {
-    def inFuture[R](fun: (CuratorEvent) => R) = {
+    def inFuture[R](fun: (CuratorEvent) => R): PathAndBytesableWithPromise[T, R] = {
       val p = Promise[R]()
       new PathAndBytesableWithPromise(backgroundPathAndBytesable.inBackground({ event: CuratorEvent =>
         p.complete(Try(fun(event)))
